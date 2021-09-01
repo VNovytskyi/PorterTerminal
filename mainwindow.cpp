@@ -45,13 +45,15 @@ MainWindow::~MainWindow()
 void MainWindow::on_serialButton_clicked()
 {
     if (ui->serialButton->text() == "Connect") {
-        QString portName = ui->serialName_ComboBox->currentText();
-        QString portSpeed = ui->serialSpeed_ComboBox->currentText();
+        core->getSerial()->setName(ui->serialName_ComboBox->currentText());
+        core->getSerial()->setSpeed(ui->serialSpeed_ComboBox->currentText().toInt());
+        core->getSerial()->setStartByte(ui->spinBox->value());
+        core->getSerial()->setDataLength(ui->spinBox_2->value());
+        core->getSerial()->setReceiveBufferSize(ui->spinBox_3->value());
 
-        core->getSerial()->setSheller(ui->spinBox->value(), ui->spinBox_2->value(), ui->spinBox_3->value());
-        if (core->getSerial()->connectTo(portName, portSpeed)) {
+        if (core->getSerial()->open()) {
             ui->serialButton->setText("Disconnect");
-            ui->statusBar->showMessage("Connected to " + portName + " with speed " + portSpeed);
+            ui->statusBar->showMessage("Connected to " + ui->serialName_ComboBox->currentText() + " with speed " + ui->serialSpeed_ComboBox->currentText());
             ui->serialName_ComboBox->setEnabled(false);
             ui->serialSpeed_ComboBox->setEnabled(false);
 
@@ -60,7 +62,7 @@ void MainWindow::on_serialButton_clicked()
             ui->spinBox_3->setEnabled(false);
         }
     } else {
-        core->getSerial()->disconnect();
+        core->getSerial()->close();
         ui->serialButton->setText("Connect");
         ui->serialName_ComboBox->setEnabled(true);
         ui->serialSpeed_ComboBox->setEnabled(true);
@@ -84,7 +86,7 @@ void MainWindow::updateSerialPortsNames()
                 currentPortsNames.push_back(el.portName());
             }
 
-            if (!core->getSerial()->isConnected()) {
+            if (!core->getSerial()->isOpen()) {
                 if (info.size()) {
                     ui->statusBar->showMessage(portNamesString);
                 } else {
