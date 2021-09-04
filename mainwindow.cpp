@@ -15,8 +15,11 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    setWindowIcon(QIcon("ShellerIcon.ico"));
+
+    setWindowIcon(QIcon("PorterIcon.ico"));
     setFixedSize(QSize(550, 450));
+
+
 
     QtConcurrent::run(this, &MainWindow::configApp);
 
